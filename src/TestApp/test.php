@@ -16,4 +16,7 @@ $shop = new Shop($config);
 $orderCount = $shop->countOrders();
 echo "Your shop has $orderCount orders!\n";
 
-echo(json_encode($shop->getOrders(), JSON_PRETTY_PRINT). "\n");
+$orders = $shop->getOrders(100);
+$shop->loadOrderDetails($orders);
+
+echo(json_encode($orders, JSON_PRETTY_PRINT). "\n");

@@ -2,6 +2,7 @@
 
 namespace JimdoShop;
 
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 
@@ -25,6 +26,10 @@ class Shop
         $this->client = new Client([
             'base_uri' => 'https://cms.e.jimdo.com/',
             'cookies' => $this->jar,
+            'headers' => [
+                'Accept' => 'application/json, text/javascript, */*; q=0.01',
+                'X-Requested-With' => 'XMLHttpRequest',
+            ],
         ]);
     }
 
@@ -106,11 +111,11 @@ class Shop
         ]);
         $data = json_decode($res->getBody()->getContents());
         if ($data->status !== 'success') {
-            throw new \Exception('Could not update stock');
+            throw new Exception('Could not update stock');
         }
     }
 
-    public function getOrders(int $limit = 1): array
+    public function getOrders(int $limit = 10): array
     {
         $res = $this->client->post('app/siteadmin/shoporder/listcurrentdata', [
             'form_params' => [
@@ -146,7 +151,7 @@ class Shop
                 'bRegex_5' => false,
                 'bSearchable_5' => true,
                 'iSortCol_0' => 0,
-                'sSortDir_0' => 'asc',
+                'sSortDir_0' => 'desc',
                 'iSortingCols' => 1,
                 'bSortable_0' => true,
                 'bSortable_1' => true,
@@ -165,5 +170,28 @@ class Shop
             $orders[] = Order::fromRow($this, $orderRow);
         }
         return $orders;
+    }
+
+    public function loadOrderDetails(array &$orders): void
+    {
+        $orderIds = array_column($orders, 'orderId');
+        if (empty($orderIds)) {
+            return;
+        }
+        $res = $this->client->post('app/siteadmin/shoporder/orderdetails', [
+            'form_params' => [
+                'order_ids' => $orderIds,
+                'buttons_group' => 'listcurrent',
+                'cstok' => $this->config->csToken,
+                'websiteid' => $this->config->websiteId,
+                'pageid' => ''
+            ]
+        ]);
+        $data = json_decode($res->getBody()->getContents());
+        foreach ($data as $orderRes) {
+            $orderIndex = array_search($orderRes->orderId, $orderIds);
+            $order = $orders[$orderIndex];
+            $order->details = OrderDetails::fromHtml($orderRes->html);
+        }
     }
 }

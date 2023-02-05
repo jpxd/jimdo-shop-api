@@ -1,12 +1,16 @@
 {
-    "name": "jpxd/jimdo-shop-api",
-    "version": "0.0.1",
-    "require": {
-        "php": "^8.1",
-        "guzzlehttp/guzzle": "^7.5",
-        "symfony/dotenv": "^6.2"
-    },
-    "autoload": {
-        "psr-4": {"JimdoShop\\": "src/JimdoShop"}
+  "name": "jpxd/jimdo-shop-api",
+  "version": "0.0.1",
+  "require": {
+    "php": "^8.1",
+    "guzzlehttp/guzzle": "^7.5",
+    "symfony/dotenv": "^6.2",
+    "ext-dom": "*",
+    "ext-libxml": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "JimdoShop\\": "src/JimdoShop"
     }
+  }
 }
