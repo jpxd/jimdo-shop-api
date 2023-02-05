@@ -33,7 +33,7 @@ class Shop
         ]);
     }
 
-    public function countOrders(): int
+    public function getOrderCount(): int
     {
         $res = $this->client->get('app/cms/poll/status/');
         $data = json_decode($res->getBody()->getContents());

@@ -13,7 +13,7 @@ $dotenv->load(__DIR__.'/.env');
 $config = Config::fromEnv();
 $shop = new Shop($config);
 
-$orderCount = $shop->countOrders();
+$orderCount = $shop->getOrderCount();
 echo "Your shop has $orderCount orders!\n";
 
 $orders = $shop->getOrders(100);
